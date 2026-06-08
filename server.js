@@ -16,14 +16,17 @@ const PORT = process.env.PORT || 3000;
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
-      defaultSrc:  ["'self'"],
-      scriptSrc:   ["'self'"],
-      styleSrc:    ["'self'", 'https://fonts.googleapis.com', "'unsafe-inline'"],
-      fontSrc:     ["'self'", 'https://fonts.gstatic.com'],
-      imgSrc:      ["'self'", 'data:'],
-      connectSrc:  ["'self'"],
+      defaultSrc:              ["'self'"],
+      scriptSrc:               ["'self'"],
+      styleSrc:                ["'self'", 'https://fonts.googleapis.com', "'unsafe-inline'"],
+      fontSrc:                 ["'self'", 'https://fonts.gstatic.com'],
+      imgSrc:                  ["'self'", 'data:'],
+      connectSrc:              ["'self'"],
+      upgradeInsecureRequests: null, // disabled — let Coolify/proxy handle HTTPS
     },
   },
+  // HSTS only makes sense behind a valid TLS terminator; disable here
+  strictTransportSecurity: false,
 }));
 
 // ── Body parsing (size limit to prevent large payload attacks) ───────────────
