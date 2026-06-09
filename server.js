@@ -12,6 +12,10 @@ const path       = require('path');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
+// Coolify sits behind a reverse proxy — trust the first hop so
+// express-rate-limit can read the real client IP from X-Forwarded-For
+app.set('trust proxy', 1);
+
 // ── Security headers ────────────────────────────────────────────────────────
 app.use(helmet({
   contentSecurityPolicy: {
@@ -54,6 +58,7 @@ const transport = nodemailer.createTransport({
   connectionTimeout: 10_000, // 10s to establish TCP connection
   greetingTimeout:   8_000,  // 8s waiting for SMTP greeting
   socketTimeout:     15_000, // 15s of inactivity before giving up
+  family:            4,      // force IPv4 — VPS has no IPv6 routing
 });
 
 // ── Helper: escape HTML so injected markup can't render in email clients ─────
