@@ -11,6 +11,10 @@ const path      = require('path');
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
+// Only this directory is served publicly. Backend files (server.js,
+// Dockerfile, package.json, .env) live outside it and are never exposed.
+const PUBLIC_DIR = path.join(__dirname, 'public');
+
 // Email is sent through the Resend HTTP API (port 443) because most VPS
 // providers (DigitalOcean, etc.) block outbound SMTP ports 25/465/587.
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
@@ -34,8 +38,11 @@ app.use(helmet({
       upgradeInsecureRequests: null, // disabled — let Coolify/proxy handle HTTPS
     },
   },
-  // HSTS only makes sense behind a valid TLS terminator; disable here
-  strictTransportSecurity: false,
+  // nexaai.es has a valid Let's Encrypt cert via Coolify → enable HSTS
+  strictTransportSecurity: {
+    maxAge: 15552000, // 180 days
+    includeSubDomains: true,
+  },
 }));
 
 // ── Body parsing (size limit to prevent large payload attacks) ───────────────
@@ -152,16 +159,13 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
   }
 });
 
-// ── Serve static files ────────────────────────────────────────────────────────
-app.use(express.static(path.join(__dirname), {
+// ── Serve static files (only from public/) ───────────────────────────────────
+// express.static serves index.html at "/" automatically. There is no client-side
+// routing, so unknown paths fall through to a clean 404 instead of echoing the page.
+app.use(express.static(PUBLIC_DIR, {
   index: 'index.html',
   dotfiles: 'deny',
 }));
-
-// ── Catch-all → index.html ────────────────────────────────────────────────────
-app.get('*', (_req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
-});
 
 app.listen(PORT, () => {
   console.log(`Nexa AI server running on port ${PORT}`);
