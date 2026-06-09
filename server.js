@@ -2,19 +2,20 @@
 
 require('dotenv').config();
 
-// Force all DNS lookups to prefer IPv4 — VPS has no IPv6 routing
-const dns = require('dns');
-dns.setDefaultResultOrder('ipv4first');
-
-const express    = require('express');
-const helmet     = require('helmet');
-const rateLimit  = require('express-rate-limit');
-const nodemailer = require('nodemailer');
-const validator  = require('validator');
-const path       = require('path');
+const express   = require('express');
+const helmet    = require('helmet');
+const rateLimit = require('express-rate-limit');
+const validator = require('validator');
+const path      = require('path');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
+
+// Email is sent through the Resend HTTP API (port 443) because most VPS
+// providers (DigitalOcean, etc.) block outbound SMTP ports 25/465/587.
+const RESEND_API_KEY = process.env.RESEND_API_KEY;
+const EMAIL_FROM     = process.env.EMAIL_FROM || 'Nexa AI <onboarding@resend.dev>';
+const CONTACT_EMAIL  = process.env.CONTACT_EMAIL;
 
 // Coolify sits behind a reverse proxy — trust the first hop so
 // express-rate-limit can read the real client IP from X-Forwarded-For
@@ -50,20 +51,37 @@ const contactLimiter = rateLimit({
   message:          { ok: false, error: 'Demasiados intentos. Prueba en 15 minutos.' },
 });
 
-// ── Nodemailer transport ─────────────────────────────────────────────────────
-const transport = nodemailer.createTransport({
-  host:             process.env.SMTP_HOST,
-  port:             Number(process.env.SMTP_PORT) || 587,
-  secure:           process.env.SMTP_SECURE === 'true',
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-  connectionTimeout: 10_000, // 10s to establish TCP connection
-  greetingTimeout:   8_000,  // 8s waiting for SMTP greeting
-  socketTimeout:     15_000, // 15s of inactivity before giving up
-  family:            4,      // force IPv4 — VPS has no IPv6 routing
-});
+// ── Helper: send email via Resend HTTP API ───────────────────────────────────
+async function sendEmail({ subject, html, text, replyTo }) {
+  const controller = new AbortController();
+  const deadline   = setTimeout(() => controller.abort(), 15_000); // 15s max
+
+  try {
+    const resp = await fetch('https://api.resend.com/emails', {
+      method:  'POST',
+      headers: {
+        Authorization:  `Bearer ${RESEND_API_KEY}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from:     EMAIL_FROM,
+        to:       CONTACT_EMAIL,
+        reply_to: replyTo,
+        subject,
+        html,
+        text,
+      }),
+      signal: controller.signal,
+    });
+
+    if (!resp.ok) {
+      const detail = await resp.text();
+      throw new Error(`Resend API ${resp.status}: ${detail}`);
+    }
+  } finally {
+    clearTimeout(deadline);
+  }
+}
 
 // ── Helper: escape HTML so injected markup can't render in email clients ─────
 function escapeHtml(str) {
@@ -119,23 +137,13 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
     <p style="margin-top:16px;color:#555">El cliente ha solicitado el primer mes gratuito de Nexa AI.</p>
   `;
 
-  // Hard deadline: if SMTP hangs beyond 20s the client gets an error instead of waiting forever
-  const timeout = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error('SMTP timeout')), 20_000)
-  );
-
   try {
-    await Promise.race([
-      transport.sendMail({
-        from:    `"Nexa AI Web" <${process.env.SMTP_USER}>`,
-        to:      process.env.CONTACT_EMAIL,
-        replyTo: data.email,
-        subject: `[Nexa AI] Nueva solicitud de ${data.business}`,
-        html,
-        text: `Nombre: ${data.name}\nNegocio: ${data.business}\nTeléfono: ${data.phone}\nEmail: ${data.email}`,
-      }),
-      timeout,
-    ]);
+    await sendEmail({
+      subject: `[Nexa AI] Nueva solicitud de ${data.business}`,
+      html,
+      text:    `Nombre: ${data.name}\nNegocio: ${data.business}\nTeléfono: ${data.phone}\nEmail: ${data.email}`,
+      replyTo: data.email,
+    });
 
     res.json({ ok: true });
   } catch (err) {
