@@ -30,21 +30,18 @@ function playConversation(container, messages, onDone) {
       setTimeout(() => {
         const typing = createTyping();
         container.appendChild(typing);
-        container.scrollTop = container.scrollHeight;
 
         setTimeout(() => {
           container.removeChild(typing);
           const bubble = createBubble(text, type);
           container.appendChild(bubble);
-          container.scrollTop = container.scrollHeight;
-        }, pause || 1200);
+          }, pause || 1200);
       }, delay);
       delay += (pause || 1200) + 400;
     } else {
       setTimeout(() => {
         const bubble = createBubble(text, type);
         container.appendChild(bubble);
-        container.scrollTop = container.scrollHeight;
       }, delay);
       delay += 500;
     }

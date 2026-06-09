@@ -44,13 +44,16 @@ const contactLimiter = rateLimit({
 
 // ── Nodemailer transport ─────────────────────────────────────────────────────
 const transport = nodemailer.createTransport({
-  host:   process.env.SMTP_HOST,
-  port:   Number(process.env.SMTP_PORT) || 587,
-  secure: process.env.SMTP_SECURE === 'true', // true → port 465, false → STARTTLS
+  host:             process.env.SMTP_HOST,
+  port:             Number(process.env.SMTP_PORT) || 587,
+  secure:           process.env.SMTP_SECURE === 'true',
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
+  connectionTimeout: 10_000, // 10s to establish TCP connection
+  greetingTimeout:   8_000,  // 8s waiting for SMTP greeting
+  socketTimeout:     15_000, // 15s of inactivity before giving up
 });
 
 // ── Helper: escape HTML so injected markup can't render in email clients ─────
@@ -107,15 +110,23 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
     <p style="margin-top:16px;color:#555">El cliente ha solicitado el primer mes gratuito de Nexa AI.</p>
   `;
 
+  // Hard deadline: if SMTP hangs beyond 20s the client gets an error instead of waiting forever
+  const timeout = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error('SMTP timeout')), 20_000)
+  );
+
   try {
-    await transport.sendMail({
-      from:    `"Nexa AI Web" <${process.env.SMTP_USER}>`,
-      to:      process.env.CONTACT_EMAIL,
-      replyTo: data.email,
-      subject: `[Nexa AI] Nueva solicitud de ${data.business}`,
-      html,
-      text: `Nombre: ${data.name}\nNegocio: ${data.business}\nTeléfono: ${data.phone}\nEmail: ${data.email}`,
-    });
+    await Promise.race([
+      transport.sendMail({
+        from:    `"Nexa AI Web" <${process.env.SMTP_USER}>`,
+        to:      process.env.CONTACT_EMAIL,
+        replyTo: data.email,
+        subject: `[Nexa AI] Nueva solicitud de ${data.business}`,
+        html,
+        text: `Nombre: ${data.name}\nNegocio: ${data.business}\nTeléfono: ${data.phone}\nEmail: ${data.email}`,
+      }),
+      timeout,
+    ]);
 
     res.json({ ok: true });
   } catch (err) {
