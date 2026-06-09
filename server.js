@@ -2,6 +2,10 @@
 
 require('dotenv').config();
 
+// Force all DNS lookups to prefer IPv4 — VPS has no IPv6 routing
+const dns = require('dns');
+dns.setDefaultResultOrder('ipv4first');
+
 const express    = require('express');
 const helmet     = require('helmet');
 const rateLimit  = require('express-rate-limit');
