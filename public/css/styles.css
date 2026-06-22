@@ -338,8 +338,11 @@ p  { color: var(--text-mid); }
   flex-direction: column;
   gap: 0.5rem;
   height: 360px;
-  overflow: hidden; /* burbujas aparecen sin mover la página */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
 }
+.chat-messages::-webkit-scrollbar { display: none; }
 
 /* ============================
    CHAT BUBBLES
@@ -592,11 +595,14 @@ p  { color: var(--text-mid); }
 .chat-demo-messages {
   padding: 1.25rem 1rem;
   height: 280px;
-  overflow: hidden; /* altura fija, las burbujas no empujan la página */
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
 }
+.chat-demo-messages::-webkit-scrollbar { display: none; }
 
 /* ============================
    PRICING
@@ -763,6 +769,7 @@ p  { color: var(--text-mid); }
   border-radius: var(--radius-lg);
   padding: 2.5rem;
   box-shadow: var(--shadow-lg);
+  min-width: 0;
 }
 
 .contact-form {
@@ -782,6 +789,7 @@ p  { color: var(--text-mid); }
   color: var(--text-dark);
 }
 .form-group input {
+  width: 100%;
   padding: 0.75rem 1rem;
   border: 1.5px solid var(--gray-mid);
   border-radius: var(--radius-sm);
@@ -790,6 +798,7 @@ p  { color: var(--text-mid); }
   color: var(--text-dark);
   transition: border-color var(--transition);
   outline: none;
+  min-width: 0;
 }
 .form-group input:focus { border-color: var(--green-primary); }
 .form-group input::placeholder { color: #aaa; }
@@ -850,6 +859,8 @@ p  { color: var(--text-mid); }
 /* ============================
    RESPONSIVE
    ============================ */
+
+/* ── Tablet (641 – 900px) ─────────────────────────────────── */
 @media (max-width: 900px) {
   .hero-inner {
     grid-template-columns: 1fr;
@@ -857,27 +868,30 @@ p  { color: var(--text-mid); }
     padding: 2rem 1.5rem 4rem;
   }
   .hero-actions { justify-content: center; }
-  .hero-trust { justify-content: center; }
-  .hero-visual { display: none; }
+  .hero-trust   { justify-content: center; }
+  .hero-visual  { display: none; }
 
   .solution-inner { grid-template-columns: 1fr; }
-  .solution-icon { flex-direction: row; }
+  .solution-icon  { flex-direction: row; }
 
+  /* 2 columnas en tablet, 1 en móvil (ver bloque <640px) */
   .cards-grid,
-  .features-grid { grid-template-columns: 1fr; }
+  .features-grid { grid-template-columns: repeat(2, 1fr); }
 
-  .steps-row { flex-direction: column; align-items: center; }
+  .steps-row  { flex-direction: column; align-items: center; }
   .step-arrow { transform: rotate(90deg); margin: 0; }
 
   .pricing-grid { grid-template-columns: 1fr; max-width: 420px; }
 
-  .contact-inner { grid-template-columns: 1fr; }
-  .contact-text { text-align: center; }
+  .contact-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+  .contact-text  { text-align: center; }
 }
 
+/* ── Móvil (≤ 640px) ──────────────────────────────────────── */
 @media (max-width: 640px) {
   .section { padding: 4rem 0; }
 
+  /* Menú hamburguesa */
   .nav-links {
     display: none;
     position: fixed;
@@ -893,11 +907,22 @@ p  { color: var(--text-mid); }
   .nav-links.open { display: flex; }
   .nav-toggle { display: flex; z-index: 1000; }
 
-  .promo-banner { flex-direction: column; text-align: center; }
-  .hero-actions { flex-direction: column; align-items: center; }
-  .hero-actions .btn { width: 100%; justify-content: center; }
+  /* Grids → 1 columna en móvil */
+  .cards-grid,
+  .features-grid { grid-template-columns: 1fr; }
 
+  /* Hero */
+  .hero-actions { flex-direction: column; align-items: stretch; }
+  .hero-actions .btn { width: 100%; justify-content: center; }
+  .hero-trust { flex-direction: column; align-items: center; gap: 0.75rem; }
+
+  /* Promo */
+  .promo-banner { flex-direction: column; text-align: center; }
+
+  /* Section header */
   .section-header { margin-bottom: 2.5rem; }
 
-  .features-grid { grid-template-columns: 1fr; }
+  /* Formulario de contacto */
+  .contact-form-wrapper { padding: 1.5rem 1.25rem; }
+  .contact-inner { gap: 2rem; }
 }

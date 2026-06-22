@@ -20,6 +20,10 @@ function createTyping() {
   return el;
 }
 
+function scrollToBottom(container) {
+  container.scrollTop = container.scrollHeight;
+}
+
 function playConversation(container, messages, onDone) {
   container.innerHTML = '';
   let delay = 600;
@@ -30,18 +34,21 @@ function playConversation(container, messages, onDone) {
       setTimeout(() => {
         const typing = createTyping();
         container.appendChild(typing);
+        scrollToBottom(container);
 
         setTimeout(() => {
           container.removeChild(typing);
           const bubble = createBubble(text, type);
           container.appendChild(bubble);
-          }, pause || 1200);
+          scrollToBottom(container);
+        }, pause || 1200);
       }, delay);
       delay += (pause || 1200) + 400;
     } else {
       setTimeout(() => {
         const bubble = createBubble(text, type);
         container.appendChild(bubble);
+        scrollToBottom(container);
       }, delay);
       delay += 500;
     }
@@ -77,7 +84,7 @@ const demoMessages = [
   { type: 'sent',     text: 'Las 10:30 genial' },
   { type: 'received', text: 'Perfecto! ¿Me confirmas tu nombre para la reserva?', pause: 1200 },
   { type: 'sent',     text: 'Soy Carlos Martínez' },
-  { type: 'received', text: '✅ ¡Listo, Carlos! Cita confirmada:\n📅 <b>Sábado, 10:30</b>\n✂️ Corte + barba\n📍 Peluquería Estilo\n\nTe enviamos un recordatorio el viernes. ¡Hasta el sábado!', pause: 2200 },
+  { type: 'received', text: '✅ ¡Listo, Carlos! Cita confirmada:\n📅 <b>Sábado, 10:30</b>\n✂️ Corte + barba\n📍 Tu Negocio\n\nTe enviamos un recordatorio el viernes. ¡Hasta el sábado!', pause: 2200 },
 ];
 
 let demoChatPlayed = false;
