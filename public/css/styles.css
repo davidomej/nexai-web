@@ -627,7 +627,7 @@ p  { color: var(--text-mid); }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 2rem;
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto 2rem;
 }
 
@@ -671,6 +671,9 @@ p  { color: var(--text-mid); }
   gap: 0.5rem;
   margin-bottom: 1.5rem;
 }
+.pricing-price-stack .pricing-price {
+  margin-bottom: 0;
+}
 .price-amount {
   font-size: 3rem;
   font-weight: 800;
@@ -694,6 +697,86 @@ p  { color: var(--text-mid); }
   color: var(--text-mid);
 }
 .pricing-featured .pricing-features li { color: rgba(255,255,255,0.9); }
+
+.pricing-desc {
+  font-size: 0.88rem;
+  color: var(--text-mid);
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+}
+
+.pricing-selfhost-note {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  background: #fff8e1;
+  border: 1px solid #ffd54f;
+  border-radius: var(--radius-sm);
+  padding: 0.75rem 0.875rem;
+  margin-top: 1.25rem;
+  font-size: 0.8rem;
+  color: #5d4037;
+  line-height: 1.45;
+}
+
+.pricing-price-stack {
+  margin-bottom: 1.25rem;
+}
+.pricing-price-stack .pricing-price {
+  margin-bottom: 0.25rem;
+}
+
+.pricing-after {
+  font-size: 0.92rem;
+  color: rgba(255,255,255,0.8);
+}
+.pricing-after strong {
+  color: white;
+}
+
+.pricing-addon {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.25);
+  border-radius: var(--radius-sm);
+  padding: 0.875rem 1rem;
+  margin-top: 1.25rem;
+}
+
+.addon-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 0.6rem;
+}
+
+.addon-price {
+  background: rgba(255,255,255,0.2);
+  padding: 0.15rem 0.6rem;
+  border-radius: var(--radius-full);
+  font-size: 0.8rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.addon-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding-left: 0.1rem;
+}
+.addon-list li {
+  font-size: 0.8rem;
+  color: rgba(255,255,255,0.82);
+  line-height: 1.4;
+}
+.addon-list li::before {
+  content: '• ';
+  color: rgba(255,255,255,0.5);
+}
 
 .pricing-note {
   text-align: center;
