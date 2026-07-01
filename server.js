@@ -159,6 +159,11 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
   }
 });
 
+// ── Thank-you page (used as Google Ads conversion goal) ──────────────────────
+app.get('/thanks', (_req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'thanks.html'));
+});
+
 // ── Serve static files (only from public/) ───────────────────────────────────
 // express.static serves index.html at "/" automatically. There is no client-side
 // routing, so unknown paths fall through to a clean 404 instead of echoing the page.
