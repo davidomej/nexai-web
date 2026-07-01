@@ -93,15 +93,14 @@ if (contactForm) {
       const json = await res.json();
 
       if (json.ok) {
-        contactForm.style.display = 'none';
-        formSuccess.style.display = 'block';
+        window.location.href = '/thanks';
       } else {
-        showFormError(json.error || 'Error desconocido. Inténtalo de nuevo.');
+        showFormError('No ha sido posible enviar el mensaje. Por favor, inténtalo de nuevo más tarde.');
         submitBtn.disabled  = false;
         submitBtn.innerHTML = original;
       }
     } catch {
-      showFormError('No se pudo conectar con el servidor. Comprueba tu conexión.');
+      showFormError('No ha sido posible enviar el mensaje. Por favor, inténtalo de nuevo más tarde.');
       submitBtn.disabled  = false;
       submitBtn.innerHTML = original;
     }
