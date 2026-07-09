@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(WHATSAPP_NUMBER=34600000000 PORT=3123 node server.js)",
+      "Bash(curl -s http://localhost:3123/api/whatsapp-link)",
+      "Bash(curl -s http://localhost:3123/api/whatsapp-qr.svg)",
+      "Bash(curl -sI http://localhost:3123/)",
+      "Bash(kill %1)",
+      "Bash(curl -s http://localhost:3123/ -o /dev/null -w \"index.html status: %{http_code}\\\\n\")",
+      "Bash(curl -s http://localhost:3123/js/whatsapp-float.js -o /dev/null -w \"whatsapp-float.js status: %{http_code}\\\\n\")",
+      "Bash(curl -s http://localhost:3123/thanks -o /dev/null -w \"thanks status: %{http_code}\\\\n\")",
+      "Bash(open http://localhost:3123/)",
+      "Bash(curl -s http://localhost:3123/api/whatsapp-qr.svg -o /tmp/qr_test.svg -w \"status: %{http_code}, content-type: %{content_type}\\\\n\")",
+      "Read(//tmp/**)",
+      "Bash(curl -s http://localhost:3123/js/whatsapp-float.js -o /dev/null -w \"status: %{http_code}, content-type: %{content_type}\\\\n\")",
+      "Bash(curl -s http://localhost:3123/)",
+      "Read(//Applications/**)",
+      "Bash(node -e \"console.log\\(process.version\\)\")",
+      "Bash(pkill -f \"node server.js\")"
+    ]
+  }
+}

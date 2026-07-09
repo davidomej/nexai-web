@@ -7,6 +7,7 @@ const helmet    = require('helmet');
 const rateLimit = require('express-rate-limit');
 const validator = require('validator');
 const path      = require('path');
+const QRCode    = require('qrcode');
 
 const app  = express();
 const PORT = process.env.PORT || 3000;
@@ -20,6 +21,13 @@ const PUBLIC_DIR = path.join(__dirname, 'public');
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const EMAIL_FROM     = process.env.EMAIL_FROM || 'Nexa AI <onboarding@resend.dev>';
 const CONTACT_EMAIL  = process.env.CONTACT_EMAIL;
+
+// WhatsApp number for the floating button, digits only (international format, no "+").
+const WHATSAPP_NUMBER  = String(process.env.WHATSAPP_NUMBER || '').replace(/\D/g, '');
+const WHATSAPP_MESSAGE = '¡Hola! Me gustaría reservar una demostración de Nexa AI para ver cómo puede gestionar las citas de mi negocio.';
+const WHATSAPP_LINK    = WHATSAPP_NUMBER
+  ? `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`
+  : null;
 
 // Coolify sits behind a reverse proxy — trust the first hop so
 // express-rate-limit can read the real client IP from X-Forwarded-For
@@ -162,6 +170,35 @@ app.post('/api/contact', contactLimiter, async (req, res) => {
 // ── Thank-you page (used as Google Ads conversion goal) ──────────────────────
 app.get('/thanks', (_req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'thanks.html'));
+});
+
+// ── WhatsApp floating button: link + QR (desktop fallback) ──────────────────
+// The wa.me link is only generated server-side to keep WHATSAPP_MESSAGE (with
+// accents/emoji) correctly encoded once, instead of duplicating it client-side.
+app.get('/api/whatsapp-link', (_req, res) => {
+  if (!WHATSAPP_LINK) {
+    return res.status(503).json({ ok: false, error: 'WhatsApp no configurado.' });
+  }
+  res.json({ ok: true, link: WHATSAPP_LINK, number: WHATSAPP_NUMBER });
+});
+
+app.get('/api/whatsapp-qr.svg', async (_req, res) => {
+  if (!WHATSAPP_LINK) {
+    return res.status(503).end();
+  }
+  try {
+    const svg = await QRCode.toString(WHATSAPP_LINK, {
+      type:    'svg',
+      margin:  1,
+      color:   { dark: '#128C7E', light: '#FFFFFF' },
+    });
+    res.set('Content-Type', 'image/svg+xml');
+    res.set('Cache-Control', 'public, max-age=3600');
+    res.send(svg);
+  } catch (err) {
+    console.error('Error generating WhatsApp QR:', err.message);
+    res.status(500).end();
+  }
 });
 
 // ── Serve static files (only from public/) ───────────────────────────────────
