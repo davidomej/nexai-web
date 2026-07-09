@@ -17,7 +17,8 @@
       "Bash(curl -s http://localhost:3123/)",
       "Read(//Applications/**)",
       "Bash(node -e \"console.log\\(process.version\\)\")",
-      "Bash(pkill -f \"node server.js\")"
+      "Bash(pkill -f \"node server.js\")",
+      "Bash(curl -s http://localhost:3123/assets/nexa_message.png -o /dev/null -w \"nexa_message.png status: %{http_code}\\\\n\")"
     ]
   }
 }
