@@ -172,6 +172,15 @@ app.get('/thanks', (_req, res) => {
   res.sendFile(path.join(PUBLIC_DIR, 'thanks.html'));
 });
 
+// ── Legal pages: clean URLs required by Google Ads/app store verification ────
+app.get('/privacy', (_req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'privacy.html'));
+});
+
+app.get('/terms', (_req, res) => {
+  res.sendFile(path.join(PUBLIC_DIR, 'terms.html'));
+});
+
 // ── WhatsApp floating button: link + QR (desktop fallback) ──────────────────
 // The wa.me link is only generated server-side to keep WHATSAPP_MESSAGE (with
 // accents/emoji) correctly encoded once, instead of duplicating it client-side.
