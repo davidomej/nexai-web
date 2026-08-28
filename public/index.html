@@ -154,7 +154,22 @@
     ]
   }
   </script>
+  
+<script>
+  window.op=window.op||function(){var n=[];return new Proxy(function(){arguments.length&&n.push([].slice.call(arguments))},{get:function(t,r){return"q"===r?n:function(){n.push([r].concat([].slice.call(arguments)))}} ,has:function(t,r){return"q"===r}}) }();
+  window.op('init', {
+	apiUrl: 'http://opapi-c6nfemtl4rtqag63s0tfunl3.134.209.244.39.sslip.io',
+    clientId: '01df3f13-f941-4496-9d8a-c1b500266cf0',
+    trackScreenViews: true,
+    trackOutgoingLinks: true,
+    trackAttributes: true,
+    // sessionReplay: {
+    //   enabled: true,
+    // },
+  });
+</script>
 
+<script src="https://openpanel.dev/op1.js" defer async></script>
   <link rel="icon" href="assets/image.png" type="image/png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
