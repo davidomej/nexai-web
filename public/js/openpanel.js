@@ -11,7 +11,7 @@ window.op = window.op || function () {
 }();
 
 window.op('init', {
-  apiUrl: 'http://opapi-c6nfemtl4rtqag63s0tfunl3.134.209.244.39.sslip.io',
+  apiUrl: 'https://analytics.api.dmcode.website',
   clientId: '01df3f13-f941-4496-9d8a-c1b500266cf0',
   trackScreenViews: true,
   trackOutgoingLinks: true,
