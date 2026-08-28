@@ -38,11 +38,12 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc:              ["'self'"],
-      scriptSrc:               ["'self'"],
+      scriptSrc:               ["'self'", 'https://openpanel.dev'],
       styleSrc:                ["'self'", 'https://fonts.googleapis.com', "'unsafe-inline'"],
       fontSrc:                 ["'self'", 'https://fonts.gstatic.com'],
       imgSrc:                  ["'self'", 'data:'],
-      connectSrc:              ["'self'"],
+      // OpenPanel sends analytics events to its self-hosted API host
+      connectSrc:              ["'self'", 'https://analytics.api.dmcode.website'],
       upgradeInsecureRequests: null, // disabled — let Coolify/proxy handle HTTPS
     },
   },
