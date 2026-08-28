@@ -43,7 +43,7 @@ app.use(helmet({
       fontSrc:                 ["'self'", 'https://fonts.gstatic.com'],
       imgSrc:                  ["'self'", 'data:'],
       // OpenPanel sends analytics events to its self-hosted API host
-      connectSrc:              ["'self'", 'http://opapi-c6nfemtl4rtqag63s0tfunl3.134.209.244.39.sslip.io'],
+      connectSrc:              ["'self'", 'https://analytics.api.dmcode.website'],
       upgradeInsecureRequests: null, // disabled — let Coolify/proxy handle HTTPS
     },
   },
